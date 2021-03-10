@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AddTransaction extends StatefulWidget {
   final Function addTransaction;
@@ -11,16 +12,32 @@ class AddTransaction extends StatefulWidget {
 
 class _AddTransactionState extends State<AddTransaction> {
   final tittleController = TextEditingController();
-
   final amountController = TextEditingController();
+  DateTime _selectedDate;
 
   submitData() {
+    if(amountController.text.isEmpty) return;
 
     final enteredTitle = tittleController.text;
     final enteredAmount = double.parse(amountController.text);
 
-    if(enteredTitle.isEmpty || enteredAmount <= 0) return;
-    return widget.addTransaction(enteredTitle, enteredAmount);
+    if(enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null) return;
+    return widget.addTransaction(enteredTitle, enteredAmount, _selectedDate);
+  }
+
+  void _presentDatePicker() {
+    showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2021),
+        lastDate: DateTime.now()
+    ).then((pickedDate) {
+      if(pickedDate==null) return;
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    });
+
   }
 
   @override
@@ -41,6 +58,13 @@ class _AddTransactionState extends State<AddTransaction> {
               controller: amountController,
               keyboardType: TextInputType.number,
               onSubmitted: (_) => submitData(),
+            ),
+            Container(
+              height: 70,
+              child: Row(children: [
+                Text(_selectedDate == null ? 'No Date chosen':  DateFormat.yMMMd().format(_selectedDate)),
+                TextButton(onPressed: _presentDatePicker , child: Text("Chose date"))
+              ],),
             ),
             TextButton(
               child: Text("Add Transaction",),
