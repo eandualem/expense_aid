@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
 
     setState(() {
       _userTransactions.add(newTx);
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(); //???
     });
   }
 
@@ -51,24 +51,71 @@ class _HomeState extends State<Home> {
       _userTransactions.removeWhere((element) => element.id == id);
     });
   }
+  bool _showChart = false;
 
   @override
   Widget build(BuildContext context) {
+
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final appBar = AppBar(
+      title: Text("Expense Aid"),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add, color: Colors.white,),
+          onPressed: () => _startAddNewTransaction(context),
+        )
+      ],
+    );
+
+
+
+    var freeSpace = MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top;
+    final txListWidget =  Container(
+        height: freeSpace * 0.70,
+        child: TransactionList(_userTransactions, _deleteTransaction)
+    );
+
+    final txCardWidget = Container(
+        height: freeSpace * 0.30,
+        child: Chart(_recentTransactions)
+    );
+
+    final txCardWidgetLand = Container(
+        height: freeSpace * 0.70,
+        child: Chart(_recentTransactions)
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Expense Aid"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white,),
-            onPressed: () => _startAddNewTransaction(context),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-         Chart(_recentTransactions),
-          TransactionList(_userTransactions, _deleteTransaction),
-        ],
+      appBar: appBar,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if(isLandscape) Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Show Chart"),
+                Switch(
+                    value: _showChart,
+                    onChanged: (val){
+                      setState(() {
+                        _showChart= val;
+                      });
+                    })
+              ],),
+            if(isLandscape)
+              _showChart
+                ? txCardWidgetLand
+                : txListWidget,
+
+            if(!isLandscape)
+              txCardWidget,
+
+            if(!isLandscape)
+              txListWidget,
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
