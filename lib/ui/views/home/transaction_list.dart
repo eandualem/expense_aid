@@ -23,10 +23,21 @@ class TransactionList extends StatelessWidget {
           ),],
       );
     }) :
+    // ListView(
+    //   children: _transactions.map((tx) => TransactionItem(
+    //     key: ValueKey(tx.id),
+    //     transaction: tx,
+    //     deleteTransaction: _deleteTransaction)
+    //   ).toList());
+
+    // List View builder has a bug when used with a key.
     ListView.builder(
         itemCount: _transactions.length,
         itemBuilder: (context, index) {
-          return TransactionItem(transaction: _transactions[index], deleteTransaction: _deleteTransaction);
+          return TransactionItem(
+            key: ValueKey(_transactions[index].id),
+            transaction: _transactions[index],
+            deleteTransaction: _deleteTransaction);
         }
     );
   }
