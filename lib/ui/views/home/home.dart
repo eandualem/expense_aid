@@ -86,34 +86,39 @@ class _HomeState extends State<Home> {
         child: Chart(_recentTransactions)
     );
 
+    List<Widget> _buildLandscapeContent(){
+      return [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Show Chart"),
+            Switch(
+                value: _showChart,
+                onChanged: (val){
+                  setState(() {
+                    _showChart= val;
+                  });
+                })
+          ],),
+        _showChart
+            ? txCardWidgetLand
+            : txListWidget,
+      ];
+    }
+    List<Widget> _buildPortraitContent(){
+      return[
+        txCardWidget,
+        txListWidget,];
+    }
+
     return Scaffold(
       appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if(isLandscape) Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Show Chart"),
-                Switch(
-                    value: _showChart,
-                    onChanged: (val){
-                      setState(() {
-                        _showChart= val;
-                      });
-                    })
-              ],),
-            if(isLandscape)
-              _showChart
-                ? txCardWidgetLand
-                : txListWidget,
-
-            if(!isLandscape)
-              txCardWidget,
-
-            if(!isLandscape)
-              txListWidget,
+            if(isLandscape) ..._buildLandscapeContent(),
+            if(!isLandscape) ..._buildPortraitContent()
           ],
         ),
       ),
